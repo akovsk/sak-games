@@ -9,6 +9,15 @@
 <meta property="og:title" content="SAK Games — игры и подписки PlayStation" />
 <meta property="og:description" content="PS Plus, EA Play, GTA+ и игры для PS4/PS5 со скидками до 70%. Моментальная выдача." />
 <meta property="og:type" content="website" />
+<meta property="og:url" content="https://akovsk.github.io/sak-games/" />
+<meta property="og:site_name" content="SAK Games" />
+<meta property="og:locale" content="ru_RU" />
+<meta property="og:image" content="https://akovsk.github.io/sak-games/og.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://akovsk.github.io/sak-games/og.jpg" />
+<link rel="apple-touch-icon" href="monogram-white.svg" />
 <link rel="icon" type="image/svg+xml" href="monogram-white.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -78,6 +87,11 @@
   .dots button{width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,.4);transition:.3s}
   .dots button.on{width:24px;background:#fff}
   @media(max-width:640px){.hero{aspect-ratio:auto;height:260px}}
+  /* вращающаяся монограмма на баннере, справа */
+  .slide .txt{max-width:min(560px,62%)}
+  .hero-mono{position:absolute;right:3%;top:10%;bottom:10%;width:30%;z-index:2;touch-action:pan-y;filter:drop-shadow(0 10px 30px rgba(0,0,0,.55))}
+  .hero-mono canvas{width:100%!important;height:100%!important;display:block}
+  @media(max-width:640px){.slide .txt{max-width:100%}.hero-mono{top:8px;right:4px;bottom:auto;width:100px;height:76px}}
 
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 22px;border-radius:999px;background:var(--accent);color:#fff;font-weight:700;font-size:14px;transition:.2s}
   .btn:hover{background:var(--accent2)}
@@ -102,7 +116,12 @@
   @media(max-width:520px){.grid{grid-template-columns:repeat(2,1fr);gap:10px}}
   .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:transform .2s,border-color .2s}
   .card:hover{transform:translateY(-3px);border-color:#3a3a44}
-  .cover{aspect-ratio:1/1;position:relative;display:flex;align-items:flex-end;padding:12px;overflow:hidden}
+  .cover{aspect-ratio:16/9;position:relative;display:flex;align-items:flex-end;padding:12px;overflow:hidden}
+  .cover > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .4s}
+  .card:hover .cover > img{transform:scale(1.05)}
+  .cover.has-img::before{background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 35%,transparent 65%,rgba(0,0,0,.4))}
+  .cover.has-img .ttl{display:none}
+  .card .name{font-weight:800;font-size:14px;line-height:1.2}
   .cover .ttl{position:relative;z-index:1;font-weight:900;font-size:clamp(14px,1.6vw,19px);line-height:1.05;text-shadow:0 2px 12px rgba(0,0,0,.5);letter-spacing:-.01em}
   .cover .plat{position:absolute;top:10px;left:10px;z-index:1;font-size:10px;font-weight:800;background:rgba(0,0,0,.55);padding:4px 7px;border-radius:6px;letter-spacing:.06em}
   .cover .disc{position:absolute;top:10px;right:10px;z-index:1;font-size:12px;font-weight:800;background:var(--accent);padding:4px 8px;border-radius:6px}
@@ -270,6 +289,7 @@
   <div class="hero">
     <div class="slides" id="slides"></div>
     <div class="dots" id="dots"></div>
+    <div class="hero-mono" id="heroMono"></div>
   </div>
 
   <div class="perks">
@@ -405,6 +425,11 @@ const CONFIG = {
   instagram: "https://instagram.com/your_sak_games",
 };
 
+// Обложки игр: файлы в папке covers/ с именем = id игры (например covers/valheim.jpg).
+// Чтобы добавить обложку — положите картинку 16:9 в covers/ и впишите id сюда.
+const COVERS = ["wolverine", "valheim", "mortal2", "nba2k27", "007", "shtownfall", "control", "dune", "beast", "dawnwalker", "ds2", "saros", "mistfall", "pragmata", "diablo4"];
+const coverImg = g => COVERS.includes(g.id) ? `covers/${g.id}.jpg` : null;
+
 const CATS = [
   { id: "all", name: "Все игры" },
   { id: "sale", name: "Топ скидок", hot: true },
@@ -417,8 +442,9 @@ const CATS = [
 const SLIDES = [
   { tag: "Чёрная пятница", title: "Скидки до 70% на хиты PS5", text: "Топ скидок недели — успейте до конца распродажи.", btn: "Смотреть скидки", act: "sale", bg: "linear-gradient(120deg,#3b0a10,#e11d2e 55%,#ff9a3c)" },
   { tag: "Подписки", title: "PS Plus Deluxe от 9090 р. за год", text: "Каталог игр, классика и пробные версии.", btn: "Выбрать подписку", act: "#subscriptions", bg: "linear-gradient(120deg,#0b1a3a,#1d4ed8 55%,#d4a62a)" },
-  { tag: "Новинка", title: "Marvel's Wolverine −23%", text: "Digital Deluxe Edition для PS5.", btn: "Купить", act: "search:Wolverine", bg: "linear-gradient(120deg,#1a1205,#a16207 50%,#facc15)" },
+  { tag: "Новинка", title: "Marvel's Wolverine −23%", text: "Digital Deluxe Edition для PS5.", btn: "Купить", act: "search:Wolverine", bg: "url(covers/wolverine.jpg) center 30%/cover no-repeat, #facc15" },
   { tag: "Хит", title: "NBA 2K27 со скидкой 55%", text: "Deluxe Edition всего за 4046 р.", btn: "Купить", act: "search:NBA", bg: "linear-gradient(120deg,#051b2c,#0e7490 55%,#f97316)" },
+  { tag: "Эксклюзив PS5", title: "SAROS Digital Deluxe −23%", text: "Новый экшен от Housemarque за 4846 р.", btn: "Купить", act: "search:SAROS", bg: "url(covers/saros.jpg) center/cover no-repeat, #1a0a02" },
 ];
 
 // Игры: price — цена со скидкой, old — старая цена
@@ -515,12 +541,14 @@ function renderGames() {
   $("#gamesTitle").textContent = state.q ? `Поиск: «${state.q}»` : state.favOnly ? "Закладки" : titles[state.cat];
   $("#grid").innerHTML = list.length ? list.map(g => `
     <article class="card">
-      <div class="cover" style="background:${coverBg(g.title)}">
+      <div class="cover ${coverImg(g) ? "has-img" : ""}" style="background:${coverBg(g.title)}">
+        ${coverImg(g) ? `<img src="${coverImg(g)}" alt="${esc(g.title)}" loading="lazy" onerror="this.parentNode.classList.remove('has-img');this.remove()">` : ""}
         <span class="plat">${g.plat}</span><span class="disc">−${disc(g)}%</span>
         <div class="ttl">${esc(g.title)}</div>
         <button class="fav ${favs.includes(g.id) ? "on" : ""}" data-fav="${g.id}" aria-label="В закладки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg></button>
       </div>
       <div class="body">
+        <div class="name">${esc(g.title)}</div>
         <div class="desc">${esc(g.desc)}</div>
         <div class="price"><b>${fmt(g.price)}</b><s>${fmt(g.old)}</s></div>
         <button class="btn" data-buy="${g.id}">Купить</button>
@@ -548,7 +576,7 @@ function openGame(id) {
   const draw = () => {
     box.innerHTML = `
       <button class="x" data-mclose aria-label="Закрыть">×</button>
-      <div class="mcov" style="background:${coverBg(g.title)}"><h3>${esc(g.title)}</h3></div>
+      <div class="mcov" style="background:${coverImg(g) ? `url(${coverImg(g)}) center/cover no-repeat,` : ""}${coverBg(g.title)}"><h3>${esc(g.title)}</h3></div>
       <div class="minfo">
         <p>${esc(g.desc)}</p>
         <div><div class="opt-label">Платформа</div><div class="chips">${plats.map(p => `<button class="chip ${p === plat ? "on" : ""}" data-plat="${p}">${p}</button>`).join("")}</div></div>
@@ -617,7 +645,7 @@ function addToCart(item) {
 function saveCart() { store.set("cart", cart); renderCart(); updateBadges(); }
 function renderCart() {
   $("#cartBody").innerHTML = cart.length ? cart.map((c, i) => `
-    <div class="citem"><div class="th" style="background:${c.bg || coverBg(c.title)}"></div>
+    <div class="citem"><div class="th" style="background:${(g => g && coverImg(g) ? `url(${coverImg(g)}) center/cover no-repeat` : c.bg || coverBg(c.title))(GAMES.find(x => x.id === c.key.split("|")[0]))}"></div>
       <div class="ci"><b>${esc(c.title)}</b><span>${esc(c.info)}</span>
         <div class="qty"><button data-q="-1" data-i="${i}">−</button>${c.qty}<button data-q="1" data-i="${i}">+</button></div></div>
       <div class="cp">${fmt(c.price * c.qty)}</div></div>`).join("") : `<div class="empty">Ваша корзина пуста</div>`;
@@ -689,10 +717,9 @@ renderCats(); renderGames(); renderSubs(); renderCart(); updateBadges(); go(0); 
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
 <script>
-(function () {
-  const box = document.getElementById("mono3d");
+function mountMonogram(box, opts = {}) {
   const D = window.SAK_SA;
-  if (!window.THREE || !D || !THREE.RoomEnvironment) return;
+  if (!box || !window.THREE || !D || !THREE.RoomEnvironment) return;
   try {
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -742,7 +769,7 @@ renderCats(); renderGames(); renderSubs(); renderCart(); updateBadges(); go(0); 
 
     // Постоянное вращение на 360°. Мышью/пальцем можно крутить с инерцией,
     // при наведении слои монограммы раздвигаются по глубине.
-    const AUTO = 0.9;                      // скорость авто-вращения, рад/с
+    const AUTO = opts.speed || 0.9;                      // скорость авто-вращения, рад/с
     let rotY = 0, rotX = 0, vel = AUTO, hover = 0, hv = 0, drag = null;
     box.addEventListener("pointerenter", () => hover = 1);
     box.addEventListener("pointerleave", () => hover = 0);
@@ -775,7 +802,9 @@ renderCats(); renderGames(); renderSubs(); renderCart(); updateBadges(); go(0); 
     });
     box.classList.add("ready");
   } catch (e) { console.warn("3D-монограмма не запустилась:", e); }
-})();
+}
+mountMonogram(document.getElementById("mono3d"));
+mountMonogram(document.getElementById("heroMono"), { speed: 0.7 });
 </script>
 </body>
 </html>
