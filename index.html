@@ -25,7 +25,7 @@
 <style>
   :root{
     --bg:#0b0b0d; --surface:#151518; --surface2:#1d1d22; --border:#2a2a31;
-    --fg:#f4f4f5; --muted:#9a9aa3; --accent:#e11d2e; --accent2:#ff4d5e; --ok:#22c55e;
+    --fg:#f4f4f5; --muted:#9a9aa3; --accent:#16a34a; --accent2:#22c55e; --ok:#4ade80;
     --radius:14px; --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -41,7 +41,7 @@
   .mono-bar{display:flex;justify-content:center;align-items:center;padding:18px 0 6px}
   .mono-bar a{display:flex;flex-direction:column;align-items:center;gap:6px}
   .mono3d{width:260px;height:150px;position:relative;display:flex;align-items:center;justify-content:center}
-  .mono3d img{height:84px;width:auto;filter:drop-shadow(0 0 18px rgba(225,29,46,.25))}
+  .mono3d img{height:84px;width:auto;filter:drop-shadow(0 0 18px rgba(22,163,74,.25))}
   .mono3d canvas{position:absolute;inset:0;width:100%!important;height:100%!important;touch-action:pan-y}
   .mono3d.ready img{display:none}
   .mono-bar span{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:var(--muted);padding-left:.42em}
@@ -152,8 +152,8 @@
   .chips{display:flex;flex-wrap:wrap;gap:6px}
   .chip{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);font-size:13px;font-weight:600;line-height:1.2;text-align:left}
   .chip small{display:block;font-size:11px;color:var(--muted);font-weight:500}
-  .chip.on{border-color:var(--accent);background:rgba(225,29,46,.12)}
-  .chip.on small{color:#fca5a5}
+  .chip.on{border-color:var(--accent);background:rgba(22,163,74,.12)}
+  .chip.on small{color:#86efac}
   .sub .note{font-size:12px;color:#fbbf24;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:10px;padding:8px 10px}
   .sub .foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:6px}
   .sub .foot b{font-size:24px;font-weight:900}
@@ -440,7 +440,7 @@ const CATS = [
 ];
 
 const SLIDES = [
-  { tag: "Чёрная пятница", title: "Скидки до 70% на хиты PS5", text: "Топ скидок недели — успейте до конца распродажи.", btn: "Смотреть скидки", act: "sale", bg: "linear-gradient(120deg,#3b0a10,#e11d2e 55%,#ff9a3c)" },
+  { tag: "Чёрная пятница", title: "Скидки до 70% на хиты PS5", text: "Топ скидок недели — успейте до конца распродажи.", btn: "Смотреть скидки", act: "sale", bg: "linear-gradient(120deg,#052e16,#16a34a 55%,#a3e635)" },
   { tag: "Подписки", title: "PS Plus Deluxe от 9090 р. за год", text: "Каталог игр, классика и пробные версии.", btn: "Выбрать подписку", act: "#subscriptions", bg: "linear-gradient(120deg,#0b1a3a,#1d4ed8 55%,#d4a62a)" },
   { tag: "Новинка", title: "Marvel's Wolverine −23%", text: "Digital Deluxe Edition для PS5.", btn: "Купить", act: "search:Wolverine", bg: "url(covers/wolverine.jpg) center 30%/cover no-repeat, #facc15" },
   { tag: "Хит", title: "NBA 2K27 со скидкой 55%", text: "Deluxe Edition всего за 4046 р.", btn: "Купить", act: "search:NBA", bg: "linear-gradient(120deg,#051b2c,#0e7490 55%,#f97316)" },
@@ -733,7 +733,7 @@ function mountMonogram(box, opts = {}) {
     scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
     const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 200);
     const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(-6, 8, 10); scene.add(key);
-    const rim = new THREE.DirectionalLight(0xff4d5e, 1.6); rim.position.set(8, -2, -6); scene.add(rim);
+    const rim = new THREE.DirectionalLight(0x4ade80, 1.6); rim.position.set(8, -2, -6); scene.add(rim);
 
     // сталь с красным отблеском — под тёмную тему магазина
     const face = new THREE.MeshPhysicalMaterial({ color: 0xd9dce0, metalness: 1.0, roughness: 0.28 });
