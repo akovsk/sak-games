@@ -217,10 +217,6 @@
   .qty{display:flex;align-items:center;gap:8px;margin-top:6px}
   .qty button{width:28px;height:28px;border-radius:8px;background:var(--surface2);border:1px solid var(--border)}
   .citem .cp{font-weight:800;white-space:nowrap}
-  .promo-row{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:12px;font-size:14px;color:var(--ok)}
-  .promo-row input{flex:1;min-width:0;height:40px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);padding:0 12px;outline:none;text-transform:uppercase}
-  .promo-row .btn{height:40px;padding:0 14px;font-size:13px}
-  .promo-x{width:22px;height:22px;border-radius:50%;background:var(--surface2);color:var(--fg);margin-left:6px}
   .total{display:flex;justify-content:space-between;font-size:18px;font-weight:900;margin-bottom:12px}
   .mnav a{display:block;padding:14px 0;border-bottom:1px solid var(--border);font-weight:600}
   .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,40px);background:#fff;color:#000;padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;z-index:200;opacity:0;transition:.3s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
@@ -396,7 +392,7 @@
 <aside class="drawer" id="cart" aria-label="Корзина">
   <div class="dh"><b>Корзина</b><button class="x" data-close>×</button></div>
   <div class="db" id="cartBody"></div>
-  <div class="df"><div class="promo-row" id="promoRow"></div><div class="total"><span>Итого</span><span id="cartTotal">0 р.</span></div><button class="btn block" id="checkout">Оформить заказ</button></div>
+  <div class="df"><div class="total"><span>Итого</span><span id="cartTotal">0 р.</span></div><button class="btn block" id="checkout">Оформить заказ</button></div>
 </aside>
 <aside class="drawer left" id="menu" aria-label="Меню">
   <div class="dh"><b>Каталог</b><button class="x" data-close>×</button></div>
@@ -441,11 +437,9 @@ const CATS = [
   { id: "ps4", name: "Игры PS4" },
   { id: "subs", name: "Подписки", href: "#subscriptions" },
   { id: "pre", name: "Предзаказы" },
-  { id: "game", name: "🎮 Игра −10%", href: "game.html", hot: true },
 ];
 
 const SLIDES = [
-  { tag: "Мини-игра", title: "Поймай скидку до −10%", text: "Сыграйте в SAK Catch и получите промокод на весь заказ.", btn: "Играть", act: "game.html", bg: "linear-gradient(120deg,#020617,#14532d 50%,#16a34a)" },
   { tag: "Чёрная пятница", title: "Скидки до 70% на хиты PS5", text: "Топ скидок недели — успейте до конца распродажи.", btn: "Смотреть скидки", act: "sale", bg: "linear-gradient(120deg,#052e16,#16a34a 55%,#a3e635)" },
   { tag: "Подписки", title: "PS Plus Deluxe от 9090 р. за год", text: "Каталог игр, классика и пробные версии.", btn: "Выбрать подписку", act: "#subscriptions", bg: "linear-gradient(120deg,#0b1a3a,#1d4ed8 55%,#d4a62a)" },
   { tag: "Новинка", title: "Marvel's Wolverine −23%", text: "Digital Deluxe Edition для PS5.", btn: "Купить", act: "search:Wolverine", bg: "url(covers/wolverine.jpg) center 30%/cover no-repeat, #facc15" },
@@ -528,7 +522,7 @@ function renderCats() {
 document.addEventListener("click", e => {
   const a = e.target.closest("[data-cat]"); if (!a) return;
   const id = a.dataset.cat; closeAll();
-  if (id === "subs" || id === "game") return;
+  if (id === "subs") return;
   state.cat = id; state.favOnly = false; renderCats(); renderGames();
 });
 
@@ -655,28 +649,8 @@ function renderCart() {
       <div class="ci"><b>${esc(c.title)}</b><span>${esc(c.info)}</span>
         <div class="qty"><button data-q="-1" data-i="${i}">−</button>${c.qty}<button data-q="1" data-i="${i}">+</button></div></div>
       <div class="cp">${fmt(c.price * c.qty)}</div></div>`).join("") : `<div class="empty">Ваша корзина пуста</div>`;
-  const t = totals();
-  $("#promoRow").innerHTML = promo
-    ? `<span>Промокод <b>${promo.code}</b> −${promo.pct}% <button class="promo-x" id="promoDel" aria-label="Убрать промокод">×</button></span><span>−${fmt(t.off)}</span>`
-    : `<input id="promoIn" placeholder="Промокод" autocomplete="off" /><button class="btn ghost" id="promoApply">Применить</button>`;
-  $("#cartTotal").textContent = fmt(t.total);
+  $("#cartTotal").textContent = fmt(cart.reduce((s, c) => s + c.price * c.qty, 0));
 }
-// ---- промокоды (выигрываются в игре game.html) ----
-const PROMOS = { SAK3: 3, SAK5: 5, SAK7: 7, SAK10: 10 };
-let promo = store.get("promo", null);
-function totals() {
-  const sum = cart.reduce((s, c) => s + c.price * c.qty, 0);
-  const off = promo ? Math.round(sum * promo.pct / 100) : 0;
-  return { sum, off, total: sum - off };
-}
-$("#promoRow").addEventListener("click", e => {
-  if (e.target.id === "promoDel") { promo = null; store.set("promo", null); return renderCart(); }
-  if (e.target.id === "promoApply") {
-    const code = $("#promoIn").value.trim().toUpperCase();
-    if (!PROMOS[code]) return toast("Такого промокода нет");
-    promo = { code, pct: PROMOS[code] }; store.set("promo", promo); renderCart(); toast(`Скидка −${promo.pct}% применена`);
-  }
-});
 $("#cartBody").addEventListener("click", e => {
   const b = e.target.closest("[data-q]"); if (!b) return;
   const c = cart[+b.dataset.i]; c.qty += +b.dataset.q;
@@ -686,9 +660,8 @@ $("#cartBody").addEventListener("click", e => {
 $("#checkout").onclick = () => {
   if (!cart.length) return toast("Корзина пуста");
   const lines = cart.map(c => `${c.title} (${c.info}) × ${c.qty} = ${fmt(c.price * c.qty)}`).join("\n");
-  const t = totals();
-  const promoLine = promo ? `\nПромокод: ${promo.code} (−${promo.pct}%, −${fmt(t.off)})` : "";
-  const text = encodeURIComponent(`Здравствуйте! Хочу оформить заказ:\n${lines}${promoLine}\nИтого: ${fmt(t.total)}`);
+  const total = fmt(cart.reduce((s, c) => s + c.price * c.qty, 0));
+  const text = encodeURIComponent(`Здравствуйте! Хочу оформить заказ:\n${lines}\nИтого: ${total}`);
   window.open(`https://t.me/share/url?url=${encodeURIComponent(CONFIG.telegram)}&text=${text}`, "_blank");
 };
 function updateBadges() {
@@ -717,7 +690,6 @@ $("#slides").onclick = e => {
   const b = e.target.closest("[data-slide]"); if (!b) return;
   const act = SLIDES[+b.dataset.slide].act;
   if (act.startsWith("#")) return $(act).scrollIntoView();
-  if (act.endsWith(".html")) return location.href = act;
   if (act.startsWith("search:")) { state.q = act.slice(7); $("#q").value = state.q; }
   else { state.cat = act; state.q = ""; state.favOnly = false; renderCats(); }
   renderGames(); $("#games").scrollIntoView();
