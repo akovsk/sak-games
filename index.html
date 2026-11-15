@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>SAK Games — магазин игр PlayStation</title>
+<meta name="description" content="SAK Games: игры для PS4 и PS5, подписки PS Plus, EA Play, GTA+, Ubisoft+ Classics. Моментальная выдача после оплаты." />
+<meta name="theme-color" content="#0b0b0d" />
+<meta property="og:title" content="SAK Games — игры и подписки PlayStation" />
+<meta property="og:description" content="PS Plus, EA Play, GTA+ и игры для PS4/PS5 со скидками до 70%. Моментальная выдача." />
+<meta property="og:type" content="website" />
+<link rel="icon" type="image/svg+xml" href="monogram-white.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0b0b0d; --surface:#151518; --surface2:#1d1d22; --border:#2a2a31;
+    --fg:#f4f4f5; --muted:#9a9aa3; --accent:#e11d2e; --accent2:#ff4d5e; --ok:#22c55e;
+    --radius:14px; --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{font-family:var(--font);background:var(--bg);color:var(--fg);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  input,select,textarea{font:inherit;color:inherit}
+  .container{max-width:1280px;margin:0 auto;padding:0 24px}
+  @media(max-width:640px){.container{padding:0 16px}}
+
+  /* ---------- monogram bar ---------- */
+  .mono-bar{display:flex;justify-content:center;align-items:center;padding:18px 0 6px}
+  .mono-bar a{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .mono3d{width:260px;height:150px;position:relative;display:flex;align-items:center;justify-content:center}
+  .mono3d img{height:84px;width:auto;filter:drop-shadow(0 0 18px rgba(225,29,46,.25))}
+  .mono3d canvas{position:absolute;inset:0;width:100%!important;height:100%!important;touch-action:pan-y}
+  .mono3d.ready img{display:none}
+  .mono-bar span{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:var(--muted);padding-left:.42em}
+  @media(max-width:640px){.mono3d{width:200px;height:116px}.mono3d img{height:64px}}
+
+  /* ---------- header ---------- */
+  header{position:sticky;top:0;z-index:50;background:rgba(11,11,13,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+  .head{display:flex;align-items:center;gap:12px;height:60px}
+  .burger{display:none;width:40px;height:40px;border-radius:10px;align-items:center;justify-content:center}
+  .burger svg{width:22px;height:22px}
+  .head-logo{display:flex;align-items:center;gap:8px;font-weight:900;letter-spacing:.04em}
+  .head-logo img{height:26px}
+  .search{flex:1;max-width:420px;margin-left:16px;position:relative}
+  .search input{width:100%;height:40px;border-radius:999px;border:1px solid var(--border);background:var(--surface);padding:0 16px 0 40px;outline:none}
+  .search input:focus{border-color:var(--accent)}
+  .search svg{position:absolute;left:14px;top:12px;width:16px;height:16px;color:var(--muted)}
+  .head-actions{margin-left:auto;display:flex;gap:6px}
+  .icon-btn{position:relative;height:40px;min-width:40px;padding:0 12px;border-radius:999px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);font-size:13px;font-weight:600}
+  .icon-btn svg{width:18px;height:18px}
+  .icon-btn .badge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:9px;background:var(--accent);font-size:11px;display:flex;align-items:center;justify-content:center;padding:0 5px}
+  .icon-btn .badge:empty{display:none}
+  nav.cats{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:0 0 10px}
+  nav.cats::-webkit-scrollbar{display:none}
+  nav.cats a{white-space:nowrap;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;color:#d4d4d8}
+  nav.cats a:hover,nav.cats a.on{background:var(--surface2);color:#fff}
+  nav.cats a.hot{color:var(--accent2)}
+  @media(max-width:760px){
+    .search{display:none}.icon-btn .lbl{display:none}
+    .burger{display:flex}
+  }
+
+  /* ---------- hero ---------- */
+  .hero{margin:20px 0 8px;position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:1920/560;min-height:220px}
+  .slides{display:flex;height:100%;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+  .slide{flex:0 0 100%;height:100%;position:relative;display:flex;align-items:flex-end;padding:clamp(18px,4vw,48px)}
+  .slide::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.65),transparent 70%)}
+  .slide .txt{position:relative;z-index:1;max-width:560px}
+  .slide small{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;background:var(--accent);padding:5px 10px;border-radius:6px;margin-bottom:12px}
+  .slide h2{font-size:clamp(24px,4.4vw,52px);line-height:1.02;font-weight:900;letter-spacing:-.02em}
+  .slide p{margin-top:10px;color:#e4e4e7;font-size:clamp(13px,1.4vw,16px)}
+  .slide .btn{margin-top:16px}
+  .dots{position:absolute;right:16px;bottom:16px;display:flex;gap:6px;z-index:2}
+  .dots button{width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,.4);transition:.3s}
+  .dots button.on{width:24px;background:#fff}
+  @media(max-width:640px){.hero{aspect-ratio:auto;height:260px}}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 22px;border-radius:999px;background:var(--accent);color:#fff;font-weight:700;font-size:14px;transition:.2s}
+  .btn:hover{background:var(--accent2)}
+  .btn.ghost{background:transparent;border:1px solid var(--border)}
+  .btn.block{width:100%}
+
+  /* ---------- perks ---------- */
+  .perks{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 8px}
+  .perk{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;gap:12px;align-items:center}
+  .perk b{display:block;font-size:14px}.perk span{font-size:12px;color:var(--muted)}
+  .perk i{font-style:normal;font-size:22px;width:40px;height:40px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;flex:none}
+  @media(max-width:900px){.perks{grid-template-columns:repeat(2,1fr)}}
+
+  /* ---------- sections ---------- */
+  section{padding:28px 0}
+  .sec-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:16px}
+  .sec-head h3{font-size:clamp(20px,2.4vw,28px);font-weight:900;letter-spacing:-.01em}
+  .sec-head p{color:var(--muted);font-size:13px;margin-top:4px}
+  .sort{height:36px;border-radius:999px;background:var(--surface);border:1px solid var(--border);padding:0 12px;font-size:13px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+  @media(max-width:520px){.grid{grid-template-columns:repeat(2,1fr);gap:10px}}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:transform .2s,border-color .2s}
+  .card:hover{transform:translateY(-3px);border-color:#3a3a44}
+  .cover{aspect-ratio:1/1;position:relative;display:flex;align-items:flex-end;padding:12px;overflow:hidden}
+  .cover .ttl{position:relative;z-index:1;font-weight:900;font-size:clamp(14px,1.6vw,19px);line-height:1.05;text-shadow:0 2px 12px rgba(0,0,0,.5);letter-spacing:-.01em}
+  .cover .plat{position:absolute;top:10px;left:10px;z-index:1;font-size:10px;font-weight:800;background:rgba(0,0,0,.55);padding:4px 7px;border-radius:6px;letter-spacing:.06em}
+  .cover .disc{position:absolute;top:10px;right:10px;z-index:1;font-size:12px;font-weight:800;background:var(--accent);padding:4px 8px;border-radius:6px}
+  .cover .fav{position:absolute;bottom:10px;right:10px;z-index:2;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center}
+  .cover .fav svg{width:16px;height:16px}
+  .cover .fav.on{color:var(--accent2)}
+  .cover .fav.on svg{fill:currentColor}
+  .cover::before{content:"";position:absolute;inset:0;background:radial-gradient(80% 60% at 70% 20%,rgba(255,255,255,.18),transparent 60%),linear-gradient(180deg,transparent 40%,rgba(0,0,0,.55))}
+  .card .body{padding:12px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .card .desc{font-size:12px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .price{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:auto}
+  .price b{font-size:18px;font-weight:900}
+  .price s{font-size:13px;color:var(--muted)}
+  .card .btn{height:38px;font-size:13px}
+  .empty{color:var(--muted);padding:30px 0;text-align:center;grid-column:1/-1}
+
+  /* ---------- subscriptions ---------- */
+  .subs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  .sub{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
+  .sub .top{padding:18px;position:relative;min-height:120px;display:flex;flex-direction:column;justify-content:flex-end}
+  .sub .top h4{font-size:22px;font-weight:900;position:relative;z-index:1}
+  .sub .top span{font-size:12px;color:#e4e4e7;position:relative;z-index:1}
+  .sub .top::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.45))}
+  .sub .inner{padding:16px;display:flex;flex-direction:column;gap:12px;flex:1}
+  .sub ul{list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13px;color:#d4d4d8}
+  .sub li{display:flex;gap:8px}.sub li::before{content:"✓";color:var(--ok);font-weight:800}
+  .opt-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);font-size:13px;font-weight:600;line-height:1.2;text-align:left}
+  .chip small{display:block;font-size:11px;color:var(--muted);font-weight:500}
+  .chip.on{border-color:var(--accent);background:rgba(225,29,46,.12)}
+  .chip.on small{color:#fca5a5}
+  .sub .note{font-size:12px;color:#fbbf24;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:10px;padding:8px 10px}
+  .sub .foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:6px}
+  .sub .foot b{font-size:24px;font-weight:900}
+  .stock{font-size:12px;color:var(--ok);display:flex;align-items:center;gap:6px}
+  .stock::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok)}
+
+  /* ---------- how / faq ---------- */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;counter-reset:s}
+  .step{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+  .step::before{counter-increment:s;content:counter(s);display:flex;width:32px;height:32px;border-radius:50%;background:var(--accent);align-items:center;justify-content:center;font-weight:900;margin-bottom:12px}
+  .step b{display:block;margin-bottom:4px}.step span{font-size:13px;color:var(--muted)}
+  @media(max-width:900px){.steps{grid-template-columns:repeat(2,1fr)}}
+  .faq details{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px}
+  .faq summary{padding:16px 18px;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:12px}
+  .faq summary::after{content:"+";font-size:20px;color:var(--muted);line-height:1}
+  .faq details[open] summary::after{content:"−"}
+  .faq details p{padding:0 18px 16px;color:#c4c4cc;font-size:14px}
+
+  /* ---------- support ---------- */
+  .support{display:grid;grid-template-columns:1fr 1.3fr;gap:16px}
+  @media(max-width:860px){.support{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+  .panel h4{font-size:18px;margin-bottom:6px}.panel p{color:var(--muted);font-size:13px}
+  .socials{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .socials a{padding:10px 14px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);font-size:13px;font-weight:600}
+  form .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:520px){form .row{grid-template-columns:1fr}}
+  form label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted);margin-top:10px}
+  form input,form select,form textarea{height:42px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);padding:0 12px;outline:none;color:var(--fg)}
+  form textarea{height:110px;padding:10px 12px;resize:vertical}
+  form input:focus,form select:focus,form textarea:focus{border-color:var(--accent)}
+  form .btn{margin-top:14px}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--border);margin-top:30px;padding:36px 0 calc(28px + env(safe-area-inset-bottom))}
+  .fcols{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:24px}
+  .fcols h5{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:12px}
+  .fcols a{display:block;font-size:14px;padding:4px 0;color:#d4d4d8}
+  .fcols a:hover{color:#fff}
+  .fbrand img{height:54px;margin-bottom:12px}
+  .fbrand p{font-size:13px;color:var(--muted);max-width:280px}
+  .copy{margin-top:28px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  @media(max-width:760px){.fcols{grid-template-columns:1fr 1fr}.fbrand{grid-column:1/-1}}
+
+  /* ---------- drawers ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90;opacity:0;pointer-events:none;transition:.25s}
+  .overlay.on{opacity:1;pointer-events:auto}
+  .drawer{position:fixed;top:0;bottom:0;right:0;width:min(420px,100%);background:var(--surface);z-index:100;transform:translateX(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;border-left:1px solid var(--border)}
+  .drawer.left{left:0;right:auto;transform:translateX(-100%);border-left:0;border-right:1px solid var(--border)}
+  .drawer.on{transform:none}
+  .drawer .dh{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)}
+  .drawer .dh b{font-size:18px}
+  .drawer .db{flex:1;overflow-y:auto;padding:12px 18px}
+  .drawer .df{padding:16px 18px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--border)}
+  .x{width:36px;height:36px;border-radius:50%;background:var(--surface2);font-size:20px;line-height:1}
+  .citem{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+  .citem .th{width:56px;height:56px;border-radius:10px;flex:none}
+  .citem .ci{flex:1;min-width:0}
+  .citem .ci b{display:block;font-size:14px}
+  .citem .ci span{font-size:12px;color:var(--muted)}
+  .qty{display:flex;align-items:center;gap:8px;margin-top:6px}
+  .qty button{width:28px;height:28px;border-radius:8px;background:var(--surface2);border:1px solid var(--border)}
+  .citem .cp{font-weight:800;white-space:nowrap}
+  .total{display:flex;justify-content:space-between;font-size:18px;font-weight:900;margin-bottom:12px}
+  .mnav a{display:block;padding:14px 0;border-bottom:1px solid var(--border);font-weight:600}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,40px);background:#fff;color:#000;padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;z-index:200;opacity:0;transition:.3s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+
+  /* ---------- окно товара ---------- */
+  .cover{cursor:pointer}
+  .modal{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:.25s}
+  .modal.on{opacity:1;pointer-events:auto}
+  .modal .mbg{position:absolute;inset:0;background:rgba(0,0,0,.7)}
+  .modal .mbox{position:relative;width:min(760px,100%);max-height:calc(100dvh - 32px);overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:18px;display:grid;grid-template-columns:1fr 1.1fr;transform:translateY(16px);transition:.25s}
+  .modal.on .mbox{transform:none}
+  .modal .mcov{min-height:320px;display:flex;align-items:flex-end;padding:20px;position:relative}
+  .modal .mcov::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.6))}
+  .modal .mcov h3{position:relative;font-size:26px;font-weight:900;line-height:1.05}
+  .modal .minfo{padding:22px;display:flex;flex-direction:column;gap:14px}
+  .modal .minfo p{color:#c4c4cc;font-size:14px}
+  .modal .x{position:absolute;top:12px;right:12px;z-index:2}
+  .modal .mprice{display:flex;align-items:baseline;gap:10px}
+  .modal .mprice b{font-size:30px;font-weight:900}
+  .modal .mprice s{color:var(--muted)}
+  .modal .mprice em{font-style:normal;background:var(--accent);font-size:13px;font-weight:800;padding:3px 8px;border-radius:6px}
+  .modal .acts{display:flex;gap:8px;margin-top:auto}
+  .modal .acts .btn{flex:1}
+  @media(max-width:640px){.modal{align-items:flex-end;padding:0}.modal .mbox{grid-template-columns:1fr;border-radius:18px 18px 0 0;max-height:92dvh}.modal .mcov{min-height:200px}.modal .minfo{padding-bottom:calc(22px + env(safe-area-inset-bottom))}}
+
+  /* ---------- нижняя панель на телефоне ---------- */
+  .tabbar{display:none}
+  @media(max-width:760px){
+    .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:80;background:rgba(17,17,20,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+    .tabbar a,.tabbar button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:600;color:#a1a1aa;padding:4px 0;position:relative}
+    .tabbar svg{width:22px;height:22px}
+    .tabbar .badge{position:absolute;top:0;left:calc(50% + 6px);min-width:16px;height:16px;border-radius:8px;background:var(--accent);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+    .tabbar .badge:empty{display:none}
+    body{padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+    .toast{bottom:calc(80px + env(safe-area-inset-bottom))}
+  }
+</style>
+</head>
+<body>
+
+<!-- Монограмма SAK наверху -->
+<div class="mono-bar">
+  <a href="#top" aria-label="SAK — на главную">
+    <div class="mono3d" id="mono3d"><img src="monogram-white.svg" alt="Монограмма SA" /></div>
+    <span>SAK&nbsp;Games</span>
+  </a>
+</div>
+
+<header id="top">
+  <div class="container">
+    <div class="head">
+      <button class="burger" id="burger" aria-label="Меню"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <a class="head-logo" href="#top"><img src="monogram-white.svg" alt="" />SAK</a>
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Поиск игр и подписок" />
+      </div>
+      <div class="head-actions">
+        <a class="icon-btn" href="#support"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="lbl">Кабинет</span></a>
+        <button class="icon-btn" id="favBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg><span class="lbl">Закладки</span><span class="badge" id="favCount"></span></button>
+        <button class="icon-btn" id="cartBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.5L21 8H6"/><circle cx="10" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg><span class="lbl">Корзина</span><span class="badge" id="cartCount"></span></button>
+      </div>
+    </div>
+    <nav class="cats" id="cats"></nav>
+  </div>
+</header>
+
+<main class="container">
+  <div class="hero">
+    <div class="slides" id="slides"></div>
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <div class="perks">
+    <div class="perk"><i>⚡</i><div><b>Моментально</b><span>Код сразу после оплаты</span></div></div>
+    <div class="perk"><i>🛡</i><div><b>Гарантия</b><span>Активация или возврат</span></div></div>
+    <div class="perk"><i>💸</i><div><b>Скидки до 70%</b><span>Ниже цен PS Store</span></div></div>
+    <div class="perk"><i>💬</i><div><b>Поддержка 24/7</b><span>Telegram и заявки</span></div></div>
+  </div>
+
+  <section id="games">
+    <div class="sec-head">
+      <div><h3 id="gamesTitle">Рекомендуемые</h3><p>Цифровые издания для PS4 и PS5</p></div>
+      <select class="sort" id="sort" aria-label="Сортировка">
+        <option value="def">По умолчанию</option>
+        <option value="asc">Сначала дешевле</option>
+        <option value="desc">Сначала дороже</option>
+        <option value="disc">По скидке</option>
+        <option value="az">По названию А–Я</option>
+      </select>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section id="subscriptions">
+    <div class="sec-head">
+      <div><h3>Подписки</h3><p>PS Plus, EA Play, GTA+ и Ubisoft+ — выберите срок и тип аккаунта</p></div>
+    </div>
+    <div class="subs" id="subs"></div>
+  </section>
+
+  <section id="how">
+    <div class="sec-head"><div><h3>Как купить</h3></div></div>
+    <div class="steps">
+      <div class="step"><b>Выберите товар</b><span>Игру, подписку или карту пополнения.</span></div>
+      <div class="step"><b>Укажите тип покупки</b><span>Новый или существующий аккаунт, консоль PS4/PS5.</span></div>
+      <div class="step"><b>Оплатите</b><span>Картой или СБП — удобным способом.</span></div>
+      <div class="step"><b>Играйте</b><span>Получите код или активацию сразу после оплаты.</span></div>
+    </div>
+  </section>
+
+  <section id="faq" class="faq">
+    <div class="sec-head"><div><h3>Вопросы и ответы</h3></div></div>
+    <details><summary>Чем отличается «новый» и «существующий» аккаунт?</summary><p>Новый аккаунт создаём мы и передаём вам данные. Существующий — активируем покупку на вашем аккаунте PSN, вы ничего не теряете из библиотеки.</p></details>
+    <details><summary>Что такое тип «P3»?</summary><p>Это покупка на общий аккаунт: вы играете со своего профиля, но без доступа к онлайн-функциям общего аккаунта. Поэтому цена заметно ниже.</p></details>
+    <details><summary>Можно ли продлить уже активную PS Plus?</summary><p>Да. Если подписка уже активна, доступен апгрейд на уровень выше со скидкой 33%.</p></details>
+    <details><summary>Сколько ждать после оплаты?</summary><p>Коды выдаются моментально. Активация на аккаунт — обычно от 5 до 30 минут в рабочее время.</p></details>
+    <details><summary>Что если код не сработал?</summary><p>Напишите в поддержку — заменим код или вернём деньги. На каждый товар действует гарантия.</p></details>
+  </section>
+
+  <section id="support">
+    <div class="sec-head"><div><h3>Поддержка</h3></div></div>
+    <div class="support">
+      <div class="panel">
+        <h4>Мы на связи</h4>
+        <p>Опишите ваш вопрос — мы создадим заявку и ответим в ней. Быстрее всего — в Telegram.</p>
+        <div class="socials">
+          <a href="#" data-link="telegram">Telegram</a>
+          <a href="#" data-link="vk">VK</a>
+          <a href="#" data-link="youtube">YouTube</a>
+          <a href="#" data-link="instagram">Instagram</a>
+        </div>
+      </div>
+      <form class="panel" id="ticket">
+        <h4>Напишите в поддержку</h4>
+        <p>Выберите отдел и приоритет. Мы ответим в этой заявке.</p>
+        <label>Тема заявки<input name="subject" required /></label>
+        <div class="row">
+          <label>Ваше имя<input name="name" required /></label>
+          <label>Email<input name="email" type="email" required /></label>
+        </div>
+        <div class="row">
+          <label>Телефон<input name="phone" type="tel" /></label>
+          <label>Отдел<select name="dept"><option>Поддержка</option><option>Отдел продаж</option></select></label>
+        </div>
+        <label>Приоритет<select name="prio"><option>Низкий</option><option selected>Средний</option><option>Высокий</option></select></label>
+        <label>Сообщение<textarea name="msg" required></textarea></label>
+        <button class="btn block" type="submit">Отправить заявку</button>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="fcols">
+      <div class="fbrand">
+        <img src="monogram-white.svg" alt="SAK" />
+        <p>SAK Games — цифровые игры и подписки для PlayStation с моментальной выдачей.</p>
+      </div>
+      <div><h5>Информация</h5><a href="#faq">FAQ</a><a href="#faq">Типы покупки</a><a href="#how">Инструкция</a><a href="#">Правила</a><a href="#">Политика конфиденциальности</a></div>
+      <div><h5>Каталог</h5><a href="#games">Игры PS5</a><a href="#games">Игры PS4</a><a href="#subscriptions">Подписки</a><a href="#games">Предзаказы</a></div>
+      <div><h5>Поддержка</h5><a href="#support">Контакты</a><a href="#support">Личный кабинет</a><a href="#" id="favLink">Закладки</a></div>
+    </div>
+    <div class="copy"><span>SAK Games © 2026</span><span>PlayStation — товарный знак Sony Interactive Entertainment. Магазин не является официальным представителем Sony.</span></div>
+  </div>
+</footer>
+
+<!-- drawers -->
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="cart" aria-label="Корзина">
+  <div class="dh"><b>Корзина</b><button class="x" data-close>×</button></div>
+  <div class="db" id="cartBody"></div>
+  <div class="df"><div class="total"><span>Итого</span><span id="cartTotal">0 р.</span></div><button class="btn block" id="checkout">Оформить заказ</button></div>
+</aside>
+<aside class="drawer left" id="menu" aria-label="Меню">
+  <div class="dh"><b>Каталог</b><button class="x" data-close>×</button></div>
+  <div class="db mnav" id="mnav"></div>
+</aside>
+<div class="toast" id="toast"></div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Товар">
+  <div class="mbg" data-mclose></div>
+  <div class="mbox" id="mbox"></div>
+</div>
+
+<nav class="tabbar" aria-label="Навигация">
+  <a href="#top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Главная</a>
+  <a href="#games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Игры</a>
+  <a href="#subscriptions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>Подписки</a>
+  <button id="tabFav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>Закладки<span class="badge" id="tabFavCount"></span></button>
+  <button id="tabCart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.5L21 8H6"/><circle cx="10" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg>Корзина<span class="badge" id="tabCartCount"></span></button>
+</nav>
+
+<script>
+/* ============================================================
+   НАСТРОЙКИ И КАТАЛОГ — редактируйте здесь
+   ============================================================ */
+const CONFIG = {
+  currency: "р.",
+  telegram: "https://t.me/your_sak_games",   // <- замените на свои ссылки
+  vk: "https://vk.com/your_sak_games",
+  youtube: "https://youtube.com/@your_sak_games",
+  instagram: "https://instagram.com/your_sak_games",
+};
+
+const CATS = [
+  { id: "all", name: "Все игры" },
+  { id: "sale", name: "Топ скидок", hot: true },
+  { id: "ps5", name: "Игры PS5" },
+  { id: "ps4", name: "Игры PS4" },
+  { id: "subs", name: "Подписки", href: "#subscriptions" },
+  { id: "pre", name: "Предзаказы" },
+];
+
+const SLIDES = [
+  { tag: "Чёрная пятница", title: "Скидки до 70% на хиты PS5", text: "Топ скидок недели — успейте до конца распродажи.", btn: "Смотреть скидки", act: "sale", bg: "linear-gradient(120deg,#3b0a10,#e11d2e 55%,#ff9a3c)" },
+  { tag: "Подписки", title: "PS Plus Deluxe от 9090 р. за год", text: "Каталог игр, классика и пробные версии.", btn: "Выбрать подписку", act: "#subscriptions", bg: "linear-gradient(120deg,#0b1a3a,#1d4ed8 55%,#d4a62a)" },
+  { tag: "Новинка", title: "Marvel's Wolverine −23%", text: "Digital Deluxe Edition для PS5.", btn: "Купить", act: "search:Wolverine", bg: "linear-gradient(120deg,#1a1205,#a16207 50%,#facc15)" },
+  { tag: "Хит", title: "NBA 2K27 со скидкой 55%", text: "Deluxe Edition всего за 4046 р.", btn: "Купить", act: "search:NBA", bg: "linear-gradient(120deg,#051b2c,#0e7490 55%,#f97316)" },
+];
+
+// Игры: price — цена со скидкой, old — старая цена
+const GAMES = [
+  { id: "wolverine",  title: "Marvel's Wolverine Digital Deluxe Edition", desc: "Новая история Росомахи от Insomniac Games.", plat: "PS5", price: 4846, old: 6293 },
+  { id: "ufc6",       title: "UFC 6 Ultimate Edition", desc: "Самый реалистичный симулятор MMA.", plat: "PS5", price: 6294, old: 8990 },
+  { id: "valheim",    title: "Valheim", desc: "Выживание и строительство в мире викингов.", plat: "PS5", price: 1700, old: 2124 },
+  { id: "mortal2",    title: "Mortal Shell II", desc: "Мрачный soulslike-экшен.", plat: "PS5", price: 2390, old: 3186 },
+  { id: "nba2k27",    title: "NBA 2K27 Deluxe Edition", desc: "Баскетбольный симулятор с бонусами Deluxe.", plat: "PS5 / PS4", price: 4046, old: 8990 },
+  { id: "007",        title: "007 First Light Deluxe Edition", desc: "Становление Джеймса Бонда.", plat: "PS5", price: 2820, old: 5639 },
+  { id: "shtownfall", title: "SILENT HILL: Townfall", desc: "Психологический хоррор во вселенной Silent Hill.", plat: "PS5", price: 2812, old: 3513 },
+  { id: "control",    title: "CONTROL Resonant Digital Deluxe Edition", desc: "Продолжение паранормального экшена Remedy.", plat: "PS5", price: 3924, old: 4903 },
+  { id: "dune",       title: "Dune: Awakening Deluxe Edition", desc: "Выживание на Арракисе.", plat: "PS5", price: 3433, old: 4903 },
+  { id: "beast",      title: "Beast of Reincarnation", desc: "Экшен-RPG от Game Freak.", plat: "PS5 / PS4", price: 2881, old: 3840 },
+  { id: "dawnwalker", title: "The Blood of Dawnwalker Eclipse Edition", desc: "Тёмное фэнтези с вампирами.", plat: "PS5", price: 4512, old: 5639 },
+  { id: "ds2",        title: "DEATH STRANDING 2: ON THE BEACH", desc: "Новая история Хидео Кодзимы.", plat: "PS5", price: 3497, old: 5639 },
+  { id: "saros",      title: "SAROS Digital Deluxe Edition", desc: "Новый проект Housemarque.", plat: "PS5", price: 4846, old: 6293 },
+  { id: "mistfall",   title: "Mistfall Hunter", desc: "Кооперативный экстракшн-экшен.", plat: "PS5", price: 1413, old: 1764 },
+  { id: "pragmata",   title: "PRAGMATA Deluxe Edition", desc: "Научно-фантастический экшен от Capcom.", plat: "PS5", price: 3924, old: 4903 },
+  { id: "diablo4",    title: "Diablo IV Standard Edition", desc: "Культовая action-RPG от Blizzard.", plat: "PS5 / PS4", price: 1766, old: 2943 },
+];
+
+// Подписки: options — варианты срока/типа, def — индекс варианта по умолчанию
+const SUBS = [
+  { id: "essential", title: "PS Plus Essential", sub: "Онлайн и игры каждый месяц", bg: "linear-gradient(135deg,#0b1a3a,#1e40af)",
+    features: ["Сетевая игра", "Ежемесячные игры в библиотеку", "Эксклюзивные скидки PS Store", "Облачные сохранения", "Share Play", "Game Help (PS5)"],
+    note: "Подписка уже активна? Доступен апгрейд со скидкой 33%.",
+    options: [{ t: "1 месяц", p: 1204 }, { t: "3 месяца", p: 3069 }, { t: "12 месяцев", p: 8696 }], def: 2, consoles: null },
+  { id: "extra", title: "PS Plus Extra", sub: "Каталог из сотен игр", bg: "linear-gradient(135deg,#1c1407,#b8860b)",
+    features: ["Всё из Essential", "Каталог игр PS4 и PS5", "Сотни игр для загрузки", "Game Help (PS5)"],
+    options: [{ t: "1 месяц", p: 1805 }, { t: "3 месяца", p: 4995 }, { t: "12 месяцев", p: 14473 }], def: 2, consoles: ["PS4", "PS5"] },
+  { id: "deluxe", title: "PS Plus Deluxe", sub: "Максимум возможностей", bg: "linear-gradient(135deg,#111,#3f3f46 60%,#d4af37)",
+    features: ["Всё из Extra", "Каталог классических игр", "Пробные версии игр", "Дополнительные привилегии"],
+    options: [{ t: "1 месяц", p: 2136 }, { t: "3 месяца", p: 5898 }, { t: "12 месяцев", p: 16730 }, { t: "P3 · 12 месяцев", p: 9090, p3: true }], def: 3, consoles: ["PS4", "PS5"] },
+  { id: "eaplay", title: "EA Play", sub: "Коллекция игр EA", bg: "linear-gradient(135deg,#3b0a10,#e11d2e)",
+    features: ["Доступ к коллекции игр EA", "Пробные версии новинок", "Эксклюзивные награды", "Скидки на покупки EA"],
+    options: [{ t: "1 месяц", p: 662 }, { t: "12 месяцев", p: 4514 }, { t: "P3 · 12 месяцев", p: 2452, p3: true }], def: 2, consoles: ["PS4", "PS5"] },
+  { id: "gtaplus", title: "GTA+", sub: "Бонусы для GTA Online", bg: "linear-gradient(135deg,#052e16,#16a34a 60%,#facc15)",
+    features: ["Ежемесячные GTA$", "Эксклюзивный контент", "Бонусы в GTA Online"],
+    options: [{ t: "1 месяц", p: 599 }], def: 0, consoles: null },
+  { id: "ubisoft", title: "Ubisoft+ Classics", sub: "Подборка игр Ubisoft", bg: "linear-gradient(135deg,#0c1445,#2563eb 60%,#38bdf8)",
+    features: ["Подборка игр Ubisoft", "Для PS4 и PS5", "Новые игры в каталоге"],
+    options: [{ t: "1 месяц", p: 418 }], def: 0, consoles: null },
+];
+
+/* ============================================================
+   ЛОГИКА
+   ============================================================ */
+const $ = (s, r = document) => r.querySelector(s);
+const fmt = n => n.toLocaleString("ru-RU") + " " + CONFIG.currency;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const store = {
+  get(k, d) { try { return JSON.parse(localStorage.getItem("sakg_" + k)) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("sakg_" + k, JSON.stringify(v)); } catch {} },
+};
+let cart = store.get("cart", []);
+let favs = store.get("favs", []);
+let state = { cat: "all", q: "", sort: "def", favOnly: false };
+
+// обложка-заглушка: градиент из названия
+function coverBg(s) {
+  let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  const a = h % 360, b = (a + 40 + (h >> 8) % 80) % 360;
+  return `linear-gradient(145deg,hsl(${a} 65% 22%),hsl(${b} 70% 45%))`;
+}
+const disc = g => Math.round((1 - g.price / g.old) * 100);
+
+function toast(t) { const el = $("#toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("on"), 1800); }
+
+// ---- категории ----
+function renderCats() {
+  const html = CATS.map(c => `<a href="${c.href || "#games"}" data-cat="${c.id}" class="${c.hot ? "hot " : ""}${state.cat === c.id && !state.favOnly ? "on" : ""}">${c.name}</a>`).join("");
+  $("#cats").innerHTML = html; $("#mnav").innerHTML = html;
+}
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-cat]"); if (!a) return;
+  const id = a.dataset.cat; closeAll();
+  if (id === "subs") return;
+  state.cat = id; state.favOnly = false; renderCats(); renderGames();
+});
+
+// ---- игры ----
+function renderGames() {
+  let list = GAMES.slice();
+  if (state.cat === "ps5") list = list.filter(g => g.plat.includes("PS5"));
+  if (state.cat === "ps4") list = list.filter(g => g.plat.includes("PS4"));
+  if (state.cat === "sale") list = list.filter(g => disc(g) >= 30);
+  if (state.cat === "pre") list = [];
+  if (state.favOnly) list = GAMES.filter(g => favs.includes(g.id));
+  if (state.q) { const q = state.q.toLowerCase(); list = GAMES.filter(g => g.title.toLowerCase().includes(q)); }
+  const S = { asc: (a, b) => a.price - b.price, desc: (a, b) => b.price - a.price, disc: (a, b) => disc(b) - disc(a), az: (a, b) => a.title.localeCompare(b.title) };
+  if (S[state.sort]) list.sort(S[state.sort]);
+  const titles = { all: "Рекомендуемые", sale: "Топ скидок", ps5: "Игры PS5", ps4: "Игры PS4", pre: "Предзаказы" };
+  $("#gamesTitle").textContent = state.q ? `Поиск: «${state.q}»` : state.favOnly ? "Закладки" : titles[state.cat];
+  $("#grid").innerHTML = list.length ? list.map(g => `
+    <article class="card">
+      <div class="cover" style="background:${coverBg(g.title)}">
+        <span class="plat">${g.plat}</span><span class="disc">−${disc(g)}%</span>
+        <div class="ttl">${esc(g.title)}</div>
+        <button class="fav ${favs.includes(g.id) ? "on" : ""}" data-fav="${g.id}" aria-label="В закладки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="desc">${esc(g.desc)}</div>
+        <div class="price"><b>${fmt(g.price)}</b><s>${fmt(g.old)}</s></div>
+        <button class="btn" data-buy="${g.id}">Купить</button>
+      </div>
+    </article>`).join("") : `<div class="empty">${state.cat === "pre" ? "Предзаказы скоро появятся" : "Ничего не найдено"}</div>`;
+}
+$("#sort").onchange = e => { state.sort = e.target.value; renderGames(); };
+$("#q").oninput = e => { state.q = e.target.value.trim(); renderGames(); };
+
+$("#grid").addEventListener("click", e => {
+  const f = e.target.closest("[data-fav]");
+  if (f) { const id = f.dataset.fav; favs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id]; store.set("favs", favs); renderGames(); updateBadges(); return; }
+  const b = e.target.closest("[data-buy]");
+  if (b) { const g = GAMES.find(x => x.id === b.dataset.buy); addToCart({ key: g.id, title: g.title, info: g.plat, price: g.price }); return; }
+  const c = e.target.closest(".card");
+  if (c) openGame(c.querySelector("[data-buy]").dataset.buy);
+});
+
+// ---- окно товара ----
+function openGame(id) {
+  const g = GAMES.find(x => x.id === id); if (!g) return;
+  const plats = g.plat.split(" / ");
+  let plat = plats[0];
+  const box = $("#mbox");
+  const draw = () => {
+    box.innerHTML = `
+      <button class="x" data-mclose aria-label="Закрыть">×</button>
+      <div class="mcov" style="background:${coverBg(g.title)}"><h3>${esc(g.title)}</h3></div>
+      <div class="minfo">
+        <p>${esc(g.desc)}</p>
+        <div><div class="opt-label">Платформа</div><div class="chips">${plats.map(p => `<button class="chip ${p === plat ? "on" : ""}" data-plat="${p}">${p}</button>`).join("")}</div></div>
+        <div class="mprice"><b>${fmt(g.price)}</b><s>${fmt(g.old)}</s><em>−${disc(g)}%</em></div>
+        <div class="stock">Есть в наличии · выдача сразу после оплаты</div>
+        <div class="acts">
+          <button class="btn ghost" data-mfav>${favs.includes(g.id) ? "♥ В закладках" : "♡ В закладки"}</button>
+          <button class="btn" data-mbuy>В корзину</button>
+        </div>
+      </div>`;
+  };
+  box.onclick = e => {
+    const p = e.target.closest("[data-plat]"); if (p) { plat = p.dataset.plat; return draw(); }
+    if (e.target.closest("[data-mfav]")) { favs = favs.includes(g.id) ? favs.filter(x => x !== g.id) : [...favs, g.id]; store.set("favs", favs); renderGames(); updateBadges(); return draw(); }
+    if (e.target.closest("[data-mbuy]")) { closeModal(); addToCart({ key: g.id + "|" + plat, title: g.title, info: plat, price: g.price }); }
+  };
+  draw();
+  $("#modal").classList.add("on"); document.body.style.overflow = "hidden";
+}
+function closeModal() { $("#modal").classList.remove("on"); document.body.style.overflow = ""; }
+$("#modal").addEventListener("click", e => { if (e.target.closest("[data-mclose]")) closeModal(); });
+$("#tabCart").onclick = () => openDrawer("cart");
+$("#tabFav").onclick = () => showFavs();
+function showFavs(e) { e && e.preventDefault(); state.favOnly = true; state.q = ""; $("#q").value = ""; renderCats(); renderGames(); $("#games").scrollIntoView(); }
+$("#favBtn").onclick = showFavs; $("#favLink").onclick = showFavs;
+
+// ---- подписки ----
+const subSel = {};
+SUBS.forEach(s => subSel[s.id] = { opt: s.def, acc: "Существующий", con: s.consoles ? s.consoles[1] : null });
+function renderSubs() {
+  $("#subs").innerHTML = SUBS.map(s => {
+    const sel = subSel[s.id], o = s.options[sel.opt];
+    return `<article class="sub" data-sub="${s.id}">
+      <div class="top" style="background:${s.bg}"><h4>${s.title}</h4><span>${s.sub}</span></div>
+      <div class="inner">
+        <ul>${s.features.map(f => `<li>${f}</li>`).join("")}</ul>
+        <div><div class="opt-label">Срок</div><div class="chips">${s.options.map((op, i) => `<button class="chip ${i === sel.opt ? "on" : ""}" data-opt="${i}">${op.t}<small>${fmt(op.p)}</small></button>`).join("")}</div></div>
+        ${o.p3 ? "" : `<div><div class="opt-label">Аккаунт</div><div class="chips">${["Новый", "Существующий"].map(a => `<button class="chip ${a === sel.acc ? "on" : ""}" data-acc="${a}">${a}</button>`).join("")}</div></div>`}
+        ${s.consoles ? `<div><div class="opt-label">Консоль</div><div class="chips">${s.consoles.map(c => `<button class="chip ${c === sel.con ? "on" : ""}" data-con="${c}">${c}</button>`).join("")}</div></div>` : ""}
+        ${s.note ? `<div class="note">${s.note}</div>` : ""}
+        <div class="foot"><div><b>${fmt(o.p)}</b><div class="stock">Есть в наличии</div></div><button class="btn" data-subbuy>Купить</button></div>
+      </div></article>`;
+  }).join("");
+}
+$("#subs").addEventListener("click", e => {
+  const card = e.target.closest("[data-sub]"); if (!card) return;
+  const s = SUBS.find(x => x.id === card.dataset.sub), sel = subSel[s.id];
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.opt) sel.opt = +t.dataset.opt;
+  else if (t.dataset.acc) sel.acc = t.dataset.acc;
+  else if (t.dataset.con) sel.con = t.dataset.con;
+  else if ("subbuy" in t.dataset) {
+    const o = s.options[sel.opt];
+    const info = [o.t, o.p3 ? null : sel.acc + " аккаунт", sel.con].filter(Boolean).join(" · ");
+    return addToCart({ key: s.id + "|" + info, title: s.title, info, price: o.p, bg: s.bg });
+  }
+  renderSubs();
+});
+
+// ---- корзина ----
+function addToCart(item) {
+  const ex = cart.find(c => c.key === item.key);
+  ex ? ex.qty++ : cart.push({ ...item, qty: 1 });
+  saveCart(); toast("Добавлено в корзину"); openDrawer("cart");
+}
+function saveCart() { store.set("cart", cart); renderCart(); updateBadges(); }
+function renderCart() {
+  $("#cartBody").innerHTML = cart.length ? cart.map((c, i) => `
+    <div class="citem"><div class="th" style="background:${c.bg || coverBg(c.title)}"></div>
+      <div class="ci"><b>${esc(c.title)}</b><span>${esc(c.info)}</span>
+        <div class="qty"><button data-q="-1" data-i="${i}">−</button>${c.qty}<button data-q="1" data-i="${i}">+</button></div></div>
+      <div class="cp">${fmt(c.price * c.qty)}</div></div>`).join("") : `<div class="empty">Ваша корзина пуста</div>`;
+  $("#cartTotal").textContent = fmt(cart.reduce((s, c) => s + c.price * c.qty, 0));
+}
+$("#cartBody").addEventListener("click", e => {
+  const b = e.target.closest("[data-q]"); if (!b) return;
+  const c = cart[+b.dataset.i]; c.qty += +b.dataset.q;
+  if (c.qty <= 0) cart.splice(+b.dataset.i, 1);
+  saveCart();
+});
+$("#checkout").onclick = () => {
+  if (!cart.length) return toast("Корзина пуста");
+  const lines = cart.map(c => `${c.title} (${c.info}) × ${c.qty} = ${fmt(c.price * c.qty)}`).join("\n");
+  const total = fmt(cart.reduce((s, c) => s + c.price * c.qty, 0));
+  const text = encodeURIComponent(`Здравствуйте! Хочу оформить заказ:\n${lines}\nИтого: ${total}`);
+  window.open(`https://t.me/share/url?url=${encodeURIComponent(CONFIG.telegram)}&text=${text}`, "_blank");
+};
+function updateBadges() {
+  $("#cartCount").textContent = cart.reduce((s, c) => s + c.qty, 0) || "";
+  $("#favCount").textContent = favs.length || "";
+  $("#tabCartCount").textContent = $("#cartCount").textContent;
+  $("#tabFavCount").textContent = favs.length || "";
+}
+
+// ---- шторки ----
+function openDrawer(id) { $("#" + id).classList.add("on"); $("#overlay").classList.add("on"); }
+function closeAll() { document.querySelectorAll(".drawer").forEach(d => d.classList.remove("on")); $("#overlay").classList.remove("on"); }
+$("#cartBtn").onclick = () => openDrawer("cart");
+$("#burger").onclick = () => openDrawer("menu");
+$("#overlay").onclick = closeAll;
+document.querySelectorAll("[data-close]").forEach(b => b.onclick = closeAll);
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closeAll(); closeModal(); } });
+
+// ---- слайдер ----
+let cur = 0;
+$("#slides").innerHTML = SLIDES.map((s, i) => `<div class="slide" style="background:${s.bg}"><div class="txt"><small>${s.tag}</small><h2>${s.title}</h2><p>${s.text}</p><button class="btn" data-slide="${i}">${s.btn}</button></div></div>`).join("");
+$("#dots").innerHTML = SLIDES.map((_, i) => `<button data-dot="${i}" aria-label="Слайд ${i + 1}"></button>`).join("");
+function go(i) { cur = (i + SLIDES.length) % SLIDES.length; $("#slides").style.transform = `translateX(-${cur * 100}%)`; document.querySelectorAll("[data-dot]").forEach((d, j) => d.classList.toggle("on", j === cur)); }
+$("#dots").onclick = e => { const d = e.target.closest("[data-dot]"); if (d) { go(+d.dataset.dot); restart(); } };
+$("#slides").onclick = e => {
+  const b = e.target.closest("[data-slide]"); if (!b) return;
+  const act = SLIDES[+b.dataset.slide].act;
+  if (act.startsWith("#")) return $(act).scrollIntoView();
+  if (act.startsWith("search:")) { state.q = act.slice(7); $("#q").value = state.q; }
+  else { state.cat = act; state.q = ""; state.favOnly = false; renderCats(); }
+  renderGames(); $("#games").scrollIntoView();
+};
+let timer; function restart() { clearInterval(timer); timer = setInterval(() => go(cur + 1), 5000); }
+let tx = 0; const hero = $(".hero");
+hero.addEventListener("touchstart", e => tx = e.touches[0].clientX, { passive: true });
+hero.addEventListener("touchend", e => { const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 40) { go(cur + (dx < 0 ? 1 : -1)); restart(); } });
+
+// ---- поддержка ----
+document.querySelectorAll("[data-link]").forEach(a => { a.href = CONFIG[a.dataset.link]; a.target = "_blank"; a.rel = "noopener"; });
+$("#ticket").onsubmit = e => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const text = encodeURIComponent(`Заявка: ${f.get("subject")}\nИмя: ${f.get("name")}\nEmail: ${f.get("email")}\nТелефон: ${f.get("phone")}\nОтдел: ${f.get("dept")} · Приоритет: ${f.get("prio")}\n\n${f.get("msg")}`);
+  window.open(`https://t.me/share/url?url=${encodeURIComponent(CONFIG.telegram)}&text=${text}`, "_blank");
+  e.target.reset(); toast("Заявка подготовлена — отправьте её в Telegram");
+};
+
+renderCats(); renderGames(); renderSubs(); renderCart(); updateBadges(); go(0); restart();
+</script>
+
+<!-- 3D-монограмма S+A (из monogram-sa-3d.html), постоянно вращается. Без интернета остаётся SVG. -->
+<script src="monogram-sa.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
+<script>
+(function () {
+  const box = document.getElementById("mono3d");
+  const D = window.SAK_SA;
+  if (!window.THREE || !D || !THREE.RoomEnvironment) return;
+  try {
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.setClearColor(0x000000, 0);
+    box.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 200);
+    const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(-6, 8, 10); scene.add(key);
+    const rim = new THREE.DirectionalLight(0xff4d5e, 1.6); rim.position.set(8, -2, -6); scene.add(rim);
+
+    // сталь с красным отблеском — под тёмную тему магазина
+    const face = new THREE.MeshPhysicalMaterial({ color: 0xd9dce0, metalness: 1.0, roughness: 0.28 });
+    const side = face.clone(); side.color = face.color.clone().multiplyScalar(0.5);
+
+    // слои по глубине: 0 — шеврон и завитки A, 1 — вершина и ножки A, 2 — S поверх
+    const DEPTH = 18, STEP = 26, root = new THREE.Group(), meshes = [];
+    for (const p of D.pieces) {
+      const [outer, ...holes] = p.loops.map((l) => {
+        const v = []; for (let i = 0; i < l.length; i += 2) v.push(new THREE.Vector2(l[i], l[i + 1])); return v;
+      });
+      const shape = new THREE.Shape(outer);
+      for (const h of holes) shape.holes.push(new THREE.Path(h));
+      const geo = new THREE.ExtrudeGeometry(shape, { depth: DEPTH, curveSegments: 4, bevelEnabled: true, bevelThickness: 2.5, bevelSize: 1.6, bevelSegments: 3 });
+      const m = new THREE.Mesh(geo, [face, side]);
+      m.userData.layer = p.layer; m.position.z = p.layer * STEP;
+      root.add(m); meshes.push(m);
+    }
+    const [bx, by, bw, bh] = D.bbox, S = 12 / bw;
+    root.scale.set(S, -S, S);
+    root.position.set(-(bx + bw / 2) * S, (by + bh / 2) * S, -(STEP + DEPTH / 2) * S);
+    const pivot = new THREE.Group(); pivot.add(root); scene.add(pivot);
+    const H = 12 * bh / bw;
+
+    function size() {
+      const w = box.clientWidth, h = box.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h; camera.updateProjectionMatrix();
+      const t = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      camera.position.set(0, 0, Math.max(12 / (t * camera.aspect), H / t) * 1.25);
+    }
+    size(); addEventListener("resize", size);
+
+    // Постоянное вращение на 360°. Мышью/пальцем можно крутить с инерцией,
+    // при наведении слои монограммы раздвигаются по глубине.
+    const AUTO = 0.9;                      // скорость авто-вращения, рад/с
+    let rotY = 0, rotX = 0, vel = AUTO, hover = 0, hv = 0, drag = null;
+    box.addEventListener("pointerenter", () => hover = 1);
+    box.addEventListener("pointerleave", () => hover = 0);
+    box.addEventListener("pointerdown", (e) => { drag = { x: e.clientX, y: e.clientY, t: performance.now() }; box.setPointerCapture(e.pointerId); });
+    box.addEventListener("pointermove", (e) => {
+      if (!drag) return;
+      const now = performance.now(), dx = e.clientX - drag.x, dy = e.clientY - drag.y, dt = Math.max(now - drag.t, 1) / 1000;
+      rotY += dx * 0.012; rotX = Math.max(-0.5, Math.min(0.5, rotX + dy * 0.006));
+      vel = (dx * 0.012) / dt;
+      drag = { x: e.clientX, y: e.clientY, t: now };
+    });
+    const end = () => { drag = null; hover = 0; };
+    box.addEventListener("pointerup", end); box.addEventListener("pointercancel", end);
+
+    let visible = true;
+    new IntersectionObserver((es) => visible = es[0].isIntersecting).observe(box);
+    const clock = new THREE.Clock();
+    renderer.setAnimationLoop(() => {
+      const dt = Math.min(clock.getDelta(), 0.05);
+      if (!visible) return;
+      if (!drag) {
+        vel += (AUTO - vel) * Math.min(dt * 1.5, 1);
+        rotY += vel * dt;
+        rotX += (0 - rotX) * Math.min(dt * 2, 1);
+      }
+      hv += (hover - hv) * 0.08;
+      for (const m of meshes) m.position.z = m.userData.layer * (STEP + hv * 60);
+      pivot.rotation.set(rotX + Math.sin(clock.elapsedTime * 0.7) * 0.06, rotY, 0);
+      renderer.render(scene, camera);
+    });
+    box.classList.add("ready");
+  } catch (e) { console.warn("3D-монограмма не запустилась:", e); }
+})();
+</script>
+</body>
+</html>
