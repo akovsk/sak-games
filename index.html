@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>SAK Games — магазин игр PlayStation</title>
-<meta name="description" content="SAK Games: игры для PS4 и PS5, подписки PS Plus, EA Play, GTA+, Ubisoft+ Classics. Моментальная выдача после оплаты." />
+<title>GTA VI уже в продаже — SAK Games</title>
+<meta name="description" content="GTA VI для PS5 — купить с моментальной выдачей. SAK Games: игры для PS4 и PS5, подписки PS Plus, EA Play, GTA+, Ubisoft+ Classics. Моментальная выдача после оплаты." />
 <meta name="theme-color" content="#0b0b0d" />
 <meta property="og:title" content="SAK Games — игры и подписки PlayStation" />
 <meta property="og:description" content="PS Plus, EA Play, GTA+ и игры для PS4/PS5 со скидками до 70%. Моментальная выдача." />
@@ -97,6 +97,21 @@
   .btn:hover{background:var(--accent2)}
   .btn.ghost{background:transparent;border:1px solid var(--border)}
   .btn.block{width:100%}
+
+  /* ---------- GTA VI ---------- */
+  .gta{margin:16px 0 8px;border-radius:var(--radius);overflow:hidden;background:linear-gradient(120deg,#2a0845 0%,#c2185b 45%,#ff7a18 75%,#ffd166 100%);padding:clamp(18px,3.5vw,36px);display:grid;grid-template-columns:1.1fr 1fr;gap:24px;align-items:center}
+  .gta h3{font-size:clamp(26px,4vw,46px);font-weight:900;line-height:1;letter-spacing:-.02em}
+  .gta .lead{margin-top:10px;color:#fff3e6;font-size:15px}
+  .gta .gbtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+  .gta .btn{background:#fff;color:#111;height:52px;padding:0 28px;font-size:16px}
+  .gta .btn:hover{background:#ffe8cc}
+  .gta .btn.ghost{background:rgba(0,0,0,.25);color:#fff;border-color:rgba(255,255,255,.5)}
+  .gta ol{list-style:none;counter-reset:g;display:flex;flex-direction:column;gap:10px}
+  .gta li{counter-increment:g;background:rgba(0,0,0,.32);border-radius:12px;padding:12px 14px 12px 52px;position:relative;font-size:14px}
+  .gta li::before{content:counter(g);position:absolute;left:12px;top:12px;width:28px;height:28px;border-radius:50%;background:#fff;color:#c2185b;font-weight:900;display:flex;align-items:center;justify-content:center}
+  .gta li b{display:block}
+  .gta li span{color:#ffe4d1;font-size:13px}
+  @media(max-width:760px){.gta{grid-template-columns:1fr}.gta .btn{flex:1}}
 
   /* ---------- perks ---------- */
   .perks{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 8px}
@@ -292,6 +307,24 @@
     <div class="hero-mono" id="heroMono"></div>
   </div>
 
+  <section class="gta" id="gta">
+    <div>
+      <small style="display:inline-block;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;background:rgba(0,0,0,.35);padding:5px 10px;border-radius:6px;margin-bottom:12px">🔥 Уже в продаже</small>
+      <h3>Grand Theft Auto VI</h3>
+      <p class="lead">Добро пожаловать в Леониду. Цифровое издание для PS5 — активация на ваш аккаунт или новый, выдача сразу после оплаты.</p>
+      <div class="gbtns">
+        <button class="btn" data-gta>Купить GTA VI</button>
+        <a class="btn ghost" href="#subscriptions">GTA+ подписка</a>
+      </div>
+    </div>
+    <ol>
+      <li><b>Нажмите «Купить GTA VI»</b><span>Игра сразу попадёт в корзину.</span></li>
+      <li><b>Оформите заказ</b><span>Откроется Telegram с готовым сообщением — просто отправьте.</span></li>
+      <li><b>Оплатите картой или СБП</b><span>Менеджер пришлёт реквизиты за пару минут.</span></li>
+      <li><b>Играйте</b><span>Активация на ваш аккаунт PSN — обычно 5–30 минут.</span></li>
+    </ol>
+  </section>
+
   <div class="perks">
     <div class="perk"><i>⚡</i><div><b>Моментально</b><span>Код сразу после оплаты</span></div></div>
     <div class="perk"><i>🛡</i><div><b>Гарантия</b><span>Активация или возврат</span></div></div>
@@ -432,6 +465,7 @@ const coverImg = g => COVERS.includes(g.id) ? `covers/${g.id}.jpg` : null;
 
 const CATS = [
   { id: "all", name: "Все игры" },
+  { id: "gta", name: "🔥 GTA VI", hot: true, href: "#gta" },
   { id: "sale", name: "Топ скидок", hot: true },
   { id: "ps5", name: "Игры PS5" },
   { id: "ps4", name: "Игры PS4" },
@@ -440,6 +474,7 @@ const CATS = [
 ];
 
 const SLIDES = [
+  { tag: "Уже в продаже", title: "GTA VI — купите прямо сейчас", text: "Цифровое издание для PS5. Моментальная выдача, оформление за пару минут.", btn: "Купить GTA VI", act: "gta", bg: "linear-gradient(120deg,#2a0845,#c2185b 50%,#ff7a18 80%,#ffd166)" },
   { tag: "Чёрная пятница", title: "Скидки до 70% на хиты PS5", text: "Топ скидок недели — успейте до конца распродажи.", btn: "Смотреть скидки", act: "sale", bg: "linear-gradient(120deg,#052e16,#16a34a 55%,#a3e635)" },
   { tag: "Подписки", title: "PS Plus Deluxe от 9090 р. за год", text: "Каталог игр, классика и пробные версии.", btn: "Выбрать подписку", act: "#subscriptions", bg: "linear-gradient(120deg,#0b1a3a,#1d4ed8 55%,#d4a62a)" },
   { tag: "Новинка", title: "Marvel's Wolverine −23%", text: "Digital Deluxe Edition для PS5.", btn: "Купить", act: "search:Wolverine", bg: "url(covers/wolverine.jpg) center 30%/cover no-repeat, #facc15" },
@@ -449,6 +484,7 @@ const SLIDES = [
 
 // Игры: price — цена со скидкой, old — старая цена
 const GAMES = [
+  { id: "gta6",       title: "Grand Theft Auto VI", desc: "Новая часть легендарной серии Rockstar Games. Штат Леонида ждёт.", plat: "PS5", price: 6990, old: 6990 },
   { id: "wolverine",  title: "Marvel's Wolverine Digital Deluxe Edition", desc: "Новая история Росомахи от Insomniac Games.", plat: "PS5", price: 4846, old: 6293 },
   { id: "ufc6",       title: "UFC 6 Ultimate Edition", desc: "Самый реалистичный симулятор MMA.", plat: "PS5", price: 6294, old: 8990 },
   { id: "valheim",    title: "Valheim", desc: "Выживание и строительство в мире викингов.", plat: "PS5", price: 1700, old: 2124 },
@@ -522,7 +558,7 @@ function renderCats() {
 document.addEventListener("click", e => {
   const a = e.target.closest("[data-cat]"); if (!a) return;
   const id = a.dataset.cat; closeAll();
-  if (id === "subs") return;
+  if (id === "subs" || id === "gta") return;
   state.cat = id; state.favOnly = false; renderCats(); renderGames();
 });
 
@@ -543,14 +579,14 @@ function renderGames() {
     <article class="card">
       <div class="cover ${coverImg(g) ? "has-img" : ""}" style="background:${coverBg(g.title)}">
         ${coverImg(g) ? `<img src="${coverImg(g)}" alt="${esc(g.title)}" loading="lazy" onerror="this.parentNode.classList.remove('has-img');this.remove()">` : ""}
-        <span class="plat">${g.plat}</span><span class="disc">−${disc(g)}%</span>
+        <span class="plat">${g.plat}</span>${disc(g) > 0 ? `<span class="disc">−${disc(g)}%</span>` : `<span class="disc">NEW</span>`}
         <div class="ttl">${esc(g.title)}</div>
         <button class="fav ${favs.includes(g.id) ? "on" : ""}" data-fav="${g.id}" aria-label="В закладки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg></button>
       </div>
       <div class="body">
         <div class="name">${esc(g.title)}</div>
         <div class="desc">${esc(g.desc)}</div>
-        <div class="price"><b>${fmt(g.price)}</b><s>${fmt(g.old)}</s></div>
+        <div class="price"><b>${fmt(g.price)}</b>${g.old > g.price ? `<s>${fmt(g.old)}</s>` : ""}</div>
         <button class="btn" data-buy="${g.id}">Купить</button>
       </div>
     </article>`).join("") : `<div class="empty">${state.cat === "pre" ? "Предзаказы скоро появятся" : "Ничего не найдено"}</div>`;
@@ -580,7 +616,7 @@ function openGame(id) {
       <div class="minfo">
         <p>${esc(g.desc)}</p>
         <div><div class="opt-label">Платформа</div><div class="chips">${plats.map(p => `<button class="chip ${p === plat ? "on" : ""}" data-plat="${p}">${p}</button>`).join("")}</div></div>
-        <div class="mprice"><b>${fmt(g.price)}</b><s>${fmt(g.old)}</s><em>−${disc(g)}%</em></div>
+        <div class="mprice"><b>${fmt(g.price)}</b>${g.old > g.price ? `<s>${fmt(g.old)}</s><em>−${disc(g)}%</em>` : ""}</div>
         <div class="stock">Есть в наличии · выдача сразу после оплаты</div>
         <div class="acts">
           <button class="btn ghost" data-mfav>${favs.includes(g.id) ? "♥ В закладках" : "♡ В закладки"}</button>
@@ -689,6 +725,7 @@ $("#dots").onclick = e => { const d = e.target.closest("[data-dot]"); if (d) { g
 $("#slides").onclick = e => {
   const b = e.target.closest("[data-slide]"); if (!b) return;
   const act = SLIDES[+b.dataset.slide].act;
+  if (act === "gta") return buyGta();
   if (act.startsWith("#")) return $(act).scrollIntoView();
   if (act.startsWith("search:")) { state.q = act.slice(7); $("#q").value = state.q; }
   else { state.cat = act; state.q = ""; state.favOnly = false; renderCats(); }
@@ -698,6 +735,10 @@ let timer; function restart() { clearInterval(timer); timer = setInterval(() => 
 let tx = 0; const hero = $(".hero");
 hero.addEventListener("touchstart", e => tx = e.touches[0].clientX, { passive: true });
 hero.addEventListener("touchend", e => { const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 40) { go(cur + (dx < 0 ? 1 : -1)); restart(); } });
+
+// ---- GTA VI ----
+function buyGta() { const g = GAMES.find(x => x.id === "gta6"); addToCart({ key: g.id + "|PS5", title: g.title, info: "PS5", price: g.price }); }
+document.querySelectorAll("[data-gta]").forEach(b => b.onclick = buyGta);
 
 // ---- поддержка ----
 document.querySelectorAll("[data-link]").forEach(a => { a.href = CONFIG[a.dataset.link]; a.target = "_blank"; a.rel = "noopener"; });
