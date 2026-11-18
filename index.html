@@ -153,6 +153,31 @@
   .card .btn{height:38px;font-size:13px}
   .empty{color:var(--muted);padding:30px 0;text-align:center;grid-column:1/-1}
 
+  /* ---------- карточки игр (вид витрины) ---------- */
+  .grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+  @media(max-width:520px){.grid{grid-template-columns:repeat(2,1fr)}}
+  .card{background:#1c1b33;border:0;border-radius:18px;position:relative;text-align:center;align-items:stretch}
+  .card .cover{margin:44px 6px 0;aspect-ratio:16/9;border-radius:4px;padding:0;align-items:center;justify-content:center}
+  .card .cover::before{display:none}
+  .card .cover .ttl{display:block;width:100%;padding:8px;text-align:center}
+  .card .cover.has-img .ttl{display:none}
+  .card .cover .plat{top:6px;left:auto;right:6px}
+  .ribbon{position:absolute;top:0;left:0;width:96px;height:96px;overflow:hidden;z-index:3;pointer-events:none;border-top-left-radius:18px}
+  .ribbon span{position:absolute;top:22px;left:-32px;width:140px;transform:rotate(-45deg);background:linear-gradient(#ef4444,#b91c1c);color:#fff;font-weight:800;font-size:13px;padding:5px 0;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+  .ribbon.new span{background:linear-gradient(#22c55e,#15803d)}
+  .card .body{align-items:center;padding:18px 12px 18px;gap:10px}
+  .card .name{font-size:16px;font-weight:800;min-height:2.4em;display:flex;align-items:center}
+  .card .desc{font-size:13px;color:#c9c8dc;-webkit-line-clamp:3}
+  .card .price{flex-direction:column;align-items:center;gap:4px;margin-top:6px}
+  .card .price b{background:#fcd34d;color:#111;border-radius:14px;padding:8px 18px;font-size:16px;box-shadow:0 4px 14px rgba(252,211,77,.25)}
+  .card .price s{font-size:13px}
+  .card .acts2{display:flex;gap:14px;justify-content:center;margin-top:8px}
+  .card .acts2 button{width:44px;height:44px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;transition:.2s}
+  .card .acts2 button:hover{transform:scale(1.08)}
+  .card .acts2 svg{width:20px;height:20px}
+  .card .acts2 .fav2.on{background:#ef4444;color:#fff}
+  @media(max-width:520px){.card .name{font-size:14px}.card .desc{font-size:12px}.card .body{padding:14px 8px}}
+
   /* ---------- subscriptions ---------- */
   .subs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
   .sub{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
@@ -577,17 +602,20 @@ function renderGames() {
   $("#gamesTitle").textContent = state.q ? `Поиск: «${state.q}»` : state.favOnly ? "Закладки" : titles[state.cat];
   $("#grid").innerHTML = list.length ? list.map(g => `
     <article class="card">
+      <div class="ribbon ${disc(g) > 0 ? "" : "new"}"><span>${disc(g) > 0 ? "−" + disc(g) + "%" : "NEW"}</span></div>
       <div class="cover ${coverImg(g) ? "has-img" : ""}" style="background:${coverBg(g.title)}">
         ${coverImg(g) ? `<img src="${coverImg(g)}" alt="${esc(g.title)}" loading="lazy" onerror="this.parentNode.classList.remove('has-img');this.remove()">` : ""}
-        <span class="plat">${g.plat}</span>${disc(g) > 0 ? `<span class="disc">−${disc(g)}%</span>` : `<span class="disc">NEW</span>`}
+        <span class="plat">${g.plat}</span>
         <div class="ttl">${esc(g.title)}</div>
-        <button class="fav ${favs.includes(g.id) ? "on" : ""}" data-fav="${g.id}" aria-label="В закладки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg></button>
       </div>
       <div class="body">
         <div class="name">${esc(g.title)}</div>
         <div class="desc">${esc(g.desc)}</div>
         <div class="price"><b>${fmt(g.price)}</b>${g.old > g.price ? `<s>${fmt(g.old)}</s>` : ""}</div>
-        <button class="btn" data-buy="${g.id}">Купить</button>
+        <div class="acts2">
+          <button data-buy="${g.id}" aria-label="В корзину"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM5.2 4H2V2h4.6l.9 2H21l-3.6 8.2a2 2 0 0 1-1.8 1.2H8.1l-.9 1.6h11.8v2H5.6l2.3-4.1L5.2 4z"/></svg></button>
+          <button class="fav2 ${favs.includes(g.id) ? "on" : ""}" data-fav="${g.id}" aria-label="В закладки"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg></button>
+        </div>
       </div>
     </article>`).join("") : `<div class="empty">${state.cat === "pre" ? "Предзаказы скоро появятся" : "Ничего не найдено"}</div>`;
 }
